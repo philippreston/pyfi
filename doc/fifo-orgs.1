@@ -58,6 +58,30 @@ in the metadata. The
 .B <key>
 can be a nested period seperated JSON path.
 .TP
+orgs triggers <uuid> get  [\-\-raw] [-p] [-H]
+Shows table of the triggers for this org
+.TP
+orgs triggers <uuid> set <action> <target> <event> [\-\-base <base>] [\-\-permission <perm>]
+Will create a new trigger for this org
+
+.B <action>
+This is the action to take for the trigger (join_role, join_org, role_grant, user_grant)
+
+.B <target>
+This is the uuid of the target of the action (i.e. UUID)
+
+.B <event>
+This is the event that excutes the trigger (user_create, dataset_create, vm_create)
+
+.B \-\-base <base>
+This is the permission base (vms, users, channels, datasets)
+Only required for role_grant and user_grant
+
+.B \-\-permission <perm>
+This is the permission to add.
+Only required for role_grant and user_grant
+
+.TP
 orgs accounting [\-\-raw] [-p] [-H] [\-\-fmt FMT] <uuid> \-\-start|\-s <ts> \-\-end|\-e <ts>
 Will display the accounting information for an organisation
 

@@ -37,7 +37,7 @@ trigger_fmt = {
 trigger_valid = {
     'vms': ['all', 'list', 'create', 'get', 'delete', 'edit', 'start', 'stop', 'reboot', 'console', 'snapshot',
             'rollback', 'snapshot_delete', 'backup', 'backup_delete'],
-    'channels': ['all', 'list', 'create', 'get', 'delete', 'edit'],
+    'channels': ['all', 'list', 'create', 'get', 'delete', 'edit','join'],
     'users': ['all', 'list', 'create', 'get', 'delete', 'edit'],
     'datasets': ['all', 'list', 'create', 'get', 'delete', 'edit']
 }

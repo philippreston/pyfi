@@ -59,6 +59,18 @@ is one or more permission elements, i.e. cloud vms create
 users grant <uuid> USER PERM...
 Revokes a permission from a user (ROLE and PERM as per grant).
 .TP
+users add_role <uuid> ROLE
+Adds a role to a given user
+
+.B ROLE
+This is the uuid of the role to add
+.TP
+users remove_role <uuid> ROLE
+Removes a role to a given user
+
+.B ROLE
+This is the uuid of the role to remove
+.TP
 users metadata <uuid> get
 Reads the metadata.
 .TP

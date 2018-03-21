@@ -5,18 +5,16 @@ from .wiggle import Entity
 from fifo.helper import d, ListAction, show_list, show_get, show_delete
 import sys
 
-
 user_fmt = {
     'uuid':
-    {'title': 'UUID', 'len': 36, 'fmt': '%36s', 'get': lambda e: d(e, ['uuid'])},
+        {'title': 'UUID', 'len': 36, 'fmt': '%36s', 'get': lambda e: d(e, ['uuid'])},
     'name':
-    {'title': 'Name', 'len': 10, 'fmt': '%-10s', 'get': lambda e: d(e, ['name'])},
+        {'title': 'Name', 'len': 10, 'fmt': '%-10s', 'get': lambda e: d(e, ['name'])},
     'roles':
-    {'title': 'Roles', 'len': 10, 'fmt': '%-10s', 'get': lambda e: str(d(e, ['roles']))},
+        {'title': 'Roles', 'len': 10, 'fmt': '%-10s', 'get': lambda e: str(d(e, ['roles']))},
     'orgs':
-    {'title': 'Orgs', 'len': 10, 'fmt': '%-10s', 'get': lambda e: str(d(e, ['orgs']))},
+        {'title': 'Orgs', 'len': 10, 'fmt': '%-10s', 'get': lambda e: str(d(e, ['orgs']))},
 }
-
 
 
 def user_create(args):
@@ -41,6 +39,7 @@ def user_create(args):
                 exit(1)
     else:
         print 'Faied to create User.'
+
 
 def grant(args):
     res = args.endpoint.grant(args.uuid, args.permission)
@@ -71,8 +70,40 @@ def revoke(args):
             print 'Revoke failed: %r' % res
             exit(1)
 
+
+def add_role(args):
+    res = args.endpoint.add_role(args.uuid, args.role)
+    if args.p:
+        if res:
+            exit(0)
+        else:
+            exit(1)
+    else:
+        if res:
+            print 'Added %r role to %s' % (args.role, args.uuid)
+        else:
+            print 'Role Add failed: %r' % res
+            exit(1)
+
+
+def remove_role(args):
+    res = args.endpoint.remove_role(args.uuid, args.role)
+    if args.p:
+        if res:
+            exit(0)
+        else:
+            exit(1)
+    else:
+        if res:
+            print 'Removed %r role from %s' % (args.role, args.uuid)
+        else:
+            print 'Role Delete failed: %r' % res
+            exit(1)
+
+
 def user_delete(args):
     args.endpoint.delete(args.endpoint.uuid_by_name(args.uuid))
+
 
 def sign_csr(args):
     if args.csr:
@@ -83,7 +114,7 @@ def sign_csr(args):
         csr = sys.stdin.read()
     uuid = args.endpoint.uuid_by_name(args.uuid)
     comment = args.comment
-    #TODO: make scope configurable?
+    # TODO: make scope configurable?
     scope = ["*"]
     r = args.endpoint.sign(uuid, comment, scope, csr)
     if r:
@@ -92,6 +123,7 @@ def sign_csr(args):
     else:
         print r
         exit(1)
+
 
 class User(Entity):
     def __init__(self, wiggle):
@@ -119,6 +151,12 @@ class User(Entity):
     def join_org(self, uuid, org):
         return self._put_attr(uuid, 'orgs/' + org, {})
 
+    def add_role(self, uuid, role_uuid):
+        return self._put_attr(uuid, 'roles/' + role_uuid, {})
+
+    def remove_role(self, uuid, role_uuid):
+        return self._delete_attr(uuid, 'roles/' + role_uuid)
+
     def make_parser(self, subparsers):
         parser_users = subparsers.add_parser('users', help='user related commands')
         parser_users.set_defaults(endpoint=self)
@@ -130,7 +168,7 @@ class User(Entity):
         parser_users_list.add_argument('-H', action='store_false')
         parser_users_list.add_argument('-p', action='store_true')
         parser_users_list.add_argument('--raw', '-r', action='store_true',
-                            help='print json array of complete data')
+                                       help='print json array of complete data')
         parser_users_list.set_defaults(func=show_list,
                                        fmt_def=user_fmt)
         parser_users_get = subparsers_users.add_parser('get', help='gets a user')
@@ -171,3 +209,14 @@ class User(Entity):
         parser_users_revoke.add_argument('uuid')
         parser_users_revoke.add_argument('permission', nargs='*')
         parser_users_revoke.set_defaults(func=revoke)
+
+        parser_users_add_role = subparsers_users.add_parser('add_role', help='adds a role to a user')
+        parser_users_add_role.add_argument('-p', action='store_true')
+        parser_users_add_role.add_argument('uuid')
+        parser_users_add_role.add_argument('role')
+        parser_users_add_role.set_defaults(func=add_role)
+        parser_users_remove_role = subparsers_users.add_parser('remove_role', help='removes a role from a user')
+        parser_users_remove_role.add_argument('-p', action='store_true')
+        parser_users_remove_role.add_argument('uuid')
+        parser_users_remove_role.add_argument('role')
+        parser_users_remove_role.set_defaults(func=remove_role)
